@@ -1,0 +1,207 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-heading {
+  padding: 0.75rem 0 0.25rem;
+}
+
+.settings-eyebrow {
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.settings-heading h2 {
+  margin-top: 0.3rem;
+  font-size: 1.75rem;
+}
+
+.settings-heading > p:last-child {
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.settings-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+}
+
+.settings-card-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 12px;
+  background: #f0f0f0;
+  color: var(--text-primary);
+}
+
+.settings-card-content {
+  min-width: 0;
+}
+
+.settings-card-content h3 {
+  font-size: 0.95rem;
+}
+
+.settings-card-content > p {
+  margin-top: 0.2rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.settings-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.settings-chip {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+}
+
+.settings-manage-button {
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.settings-modal {
+  width: min(100%, 420px);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.settings-modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.settings-modal-heading h3 {
+  margin-top: 0.2rem;
+  font-size: 1.15rem;
+}
+
+.settings-close-button,
+.settings-add-form button,
+.settings-managed-item button {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+}
+
+.settings-close-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: #f0f0f0;
+  color: var(--text-primary);
+}
+
+.settings-add-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.settings-add-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.settings-add-form button {
+  width: 2.7rem;
+  border-radius: 10px;
+  background: var(--text-primary);
+  color: #ffffff;
+}
+
+.settings-managed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+}
+
+.settings-managed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.settings-managed-item button {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  background: #f0f0f0;
+  color: var(--text-primary);
+}
+
+.settings-note,
+.settings-error {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.settings-note {
+  color: var(--text-secondary);
+}
+
+.settings-error {
+  color: #8d1b1b;
+}

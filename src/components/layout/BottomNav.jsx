@@ -1,4 +1,4 @@
-import { Home, CalendarDays, Utensils } from 'lucide-react'
+import { Home, CalendarDays, Settings as SettingsIcon, Utensils } from 'lucide-react'
 import './BottomNav.css'
 
 export default function BottomNav({ activeTab, setActiveTab }) {
@@ -15,6 +15,10 @@ export default function BottomNav({ activeTab, setActiveTab }) {
       <button className={`nav-item ${activeTab === 'analysis' ? 'active' : ''}`} onClick={() => setActiveTab('analysis')}>
         <CalendarDays size={24} />
         <span>Analysis</span>
+      </button>
+      <button className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+        <SettingsIcon size={24} />
+        <span>Settings</span>
       </button>
     </nav>
   )
