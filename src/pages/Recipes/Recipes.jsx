@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileImage, FileText, ImagePlus, Pencil, Plus, Printer, Search, Trash2, X } from 'lucide-react'
+import { Clipboard, FileImage, ImagePlus, Pencil, Plus, Printer, Search, Trash2, X } from 'lucide-react'
 import { getIngredientCost, getRecipeCost } from '../../utils/recipeCost'
 import './Recipes.css'
 
@@ -311,6 +311,7 @@ export default function Recipes({
   const [formError, setFormError] = useState('')
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const [detailExportError, setDetailExportError] = useState('')
+  const [detailExportMessage, setDetailExportMessage] = useState('')
   const [editingRecipe, setEditingRecipe] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -433,30 +434,6 @@ export default function Recipes({
       return
     }
 
-    const handleInstructionImageChange = async (index, event) => {
-      const file = event.target.files?.[0]
-      if (!file) return
-      event.target.value = ''
-
-      if (!file.type.startsWith('image/')) {
-        setFormError('Please choose an image file.')
-        return
-      }
-
-      try {
-        const image = await readImage(file)
-        if (image.length > 500_000) {
-          setFormError('This image is too large to save. Please choose a smaller image.')
-          return
-        }
-        updateInstruction(index, 'image', image)
-        setFormError('')
-      } catch (error) {
-        console.error('Unable to process instruction image.', error)
-        setFormError('Unable to load this image. Please try another one.')
-      }
-    }
-
     try {
       const image = await readImage(file)
       if (image.length > 500_000) {
@@ -467,6 +444,30 @@ export default function Recipes({
       setFormError('')
     } catch (error) {
       console.error('Unable to process recipe image.', error)
+      setFormError('Unable to load this image. Please try another one.')
+    }
+  }
+
+  const handleInstructionImageChange = async (index, event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    event.target.value = ''
+
+    if (!file.type.startsWith('image/')) {
+      setFormError('Please choose an image file.')
+      return
+    }
+
+    try {
+      const image = await readImage(file)
+      if (image.length > 500_000) {
+        setFormError('This image is too large to save. Please choose a smaller image.')
+        return
+      }
+      updateInstruction(index, 'image', image)
+      setFormError('')
+    } catch (error) {
+      console.error('Unable to process instruction image.', error)
       setFormError('Unable to load this image. Please try another one.')
     }
   }
@@ -534,11 +535,24 @@ export default function Recipes({
 
   const handleExportImage = async () => {
     setDetailExportError('')
+    setDetailExportMessage('')
     try {
       await exportRecipeImage(selectedRecipe)
     } catch (error) {
       console.error('Unable to export recipe image.', error)
       setDetailExportError('Unable to export this image. Please try again.')
+    }
+  }
+
+  const handleCopyRecipeText = async () => {
+    setDetailExportError('')
+    setDetailExportMessage('')
+    try {
+      await navigator.clipboard.writeText(getRecipeText(selectedRecipe))
+      setDetailExportMessage('Recipe copied to clipboard.')
+    } catch (error) {
+      console.error('Unable to copy recipe text.', error)
+      setDetailExportError('Unable to copy recipe text. Please check clipboard permissions and try again.')
     }
   }
 
@@ -593,22 +607,20 @@ export default function Recipes({
               onClick={() => {
                 setSelectedRecipe(recipe)
                 setDetailExportError('')
+                setDetailExportMessage('')
               }}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
                   setSelectedRecipe(recipe)
+                  setDetailExportError('')
+                  setDetailExportMessage('')
                 }
               }}
             >
               <div className="recipe-card-heading">
                 <h3>{recipe.title}</h3>
                 <span className="recipe-category">{recipe.category}</span>
-              </div>
-              <div className="recipe-preview">
-                <p className="recipe-added-date">Added {formatAddedDate(recipe.createdAt)}</p>
-                <RecipeDetails recipe={recipe} showHeading={false} />
-                <p className="open-recipe-hint">Click to view and export</p>
               </div>
             </article>
           )
@@ -632,46 +644,49 @@ export default function Recipes({
         >
           <section className="recipe-modal recipe-detail-modal" role="dialog" aria-modal="true" aria-labelledby="recipe-detail-title">
             <div className="recipe-modal-heading">
-              <div>
+              <div className="recipe-detail-title">
                 <h2 id="recipe-detail-title">{selectedRecipe.title}</h2>
                 <span className="recipe-category">{selectedRecipe.category}</span>
                 <p className="recipe-added-date">Added {formatAddedDate(selectedRecipe.createdAt)}</p>
               </div>
-              <button
-                className="icon-button"
-                type="button"
-                onClick={() => setSelectedRecipe(null)}
-                aria-label="Close recipe details"
-              >
-                <X size={20} />
-              </button>
+              <div className="recipe-detail-header-actions">
+                <button className="recipe-header-action" type="button" onClick={openEditRecipe} aria-label="Edit recipe" title="Edit">
+                  <Pencil size={17} />
+                </button>
+                <button
+                  className="recipe-header-action delete-recipe-action"
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  aria-label="Delete recipe"
+                  title="Delete"
+                >
+                  <Trash2 size={17} />
+                </button>
+                <button
+                  className="icon-button"
+                  type="button"
+                  onClick={() => setSelectedRecipe(null)}
+                  aria-label="Close recipe details"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
             <div className="recipe-detail-content">
               <RecipeDetails recipe={selectedRecipe} showHeading={false} />
             </div>
             <div className="recipe-export-actions">
-              <button type="button" onClick={openEditRecipe}>
-                <Pencil size={17} /> Edit
-              </button>
-              <button className="delete-recipe-action" type="button" onClick={() => setShowDeleteConfirm(true)}>
-                <Trash2 size={17} /> Delete
-              </button>
               <button type="button" onClick={handleExportImage}>
                 <FileImage size={17} /> Export PNG
               </button>
-              <button
-                type="button"
-                onClick={() => downloadBlob(
-                  new Blob([getRecipeText(selectedRecipe)], { type: 'text/plain;charset=utf-8' }),
-                  `${selectedRecipe.title || 'recipe'}.txt`,
-                )}
-              >
-                <FileText size={17} /> Export TXT
+              <button type="button" onClick={handleCopyRecipeText}>
+                <Clipboard size={17} /> Copy to clipboard
               </button>
               <button type="button" onClick={() => window.print()}>
                 <Printer size={17} /> Print / Save PDF
               </button>
             </div>
+            {detailExportMessage && <p className="copy-success" role="status">{detailExportMessage}</p>}
             {detailExportError && <p className="form-error" role="alert">{detailExportError}</p>}
             {showDeleteConfirm && (
               <div className="delete-confirmation" role="alertdialog" aria-labelledby="delete-recipe-title">
