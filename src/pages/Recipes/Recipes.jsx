@@ -84,12 +84,13 @@ function getRecipeText(recipe) {
   const instructions = getRecipeInstructions(recipe).map((instruction) => {
     if (instruction.type === 'remark') return `Remark: ${instruction.text}`
     stepNumber += 1
-    return `${stepNumber}. ${instruction.text}`
+    return `${stepNumber}. ${instruction.text}${instruction.image ? '\n   Step photo: attached' : ''}`
   })
 
   return [
     recipe.title,
     `Category: ${recipe.category}`,
+    ...(recipe.image ? ['Recipe photo: attached'] : []),
     '',
     'Ingredients',
     ...ingredients.map((ingredient) => `- ${getIngredientLabel(ingredient)}`),
@@ -622,6 +623,13 @@ export default function Recipes({
                 <h3>{recipe.title}</h3>
                 <span className="recipe-category">{recipe.category}</span>
               </div>
+              <div className="recipe-preview">
+                <div className="recipe-preview-content">
+                  <p className="recipe-added-date">Added {formatAddedDate(recipe.createdAt)}</p>
+                  <RecipeDetails recipe={recipe} showHeading={false} />
+                  <p className="open-recipe-hint">Click to view and export</p>
+                </div>
+              </div>
             </article>
           )
         }) : (
@@ -680,7 +688,7 @@ export default function Recipes({
                 <FileImage size={17} /> Export PNG
               </button>
               <button type="button" onClick={handleCopyRecipeText}>
-                <Clipboard size={17} /> Copy to clipboard
+                <Clipboard size={17} /> Copy full recipe
               </button>
               <button type="button" onClick={() => window.print()}>
                 <Printer size={17} /> Print / Save PDF
