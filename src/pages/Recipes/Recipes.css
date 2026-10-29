@@ -561,17 +561,6 @@
   appearance: none;
 }
 
-.ingredient-cost-mode {
-  padding: 0 0.2rem;
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
-  font: inherit;
-  font-size: 0.62rem;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .ingredient-purchase-details {
   padding: 0.1rem 0.15rem 0;
 }
@@ -660,6 +649,7 @@
 .instruction-input-row textarea {
   width: 100%;
   min-width: 0;
+  min-height: 3.5rem;
   padding: 0.55rem;
   border: 1px solid #d6d6d6;
   border-radius: 9px;
@@ -796,6 +786,13 @@
   font-weight: 400;
 }
 
+.recipe-form .ingredient-input-row input,
+.recipe-form .ingredient-input-row select,
+.recipe-form .purchase-input-row input,
+.recipe-form .purchase-input-row select {
+  font-size: 0.75rem;
+}
+
 .recipe-form textarea {
   resize: vertical;
 }
@@ -857,10 +854,6 @@
     max-width: 55%;
   }
 
-  .ingredient-cost-mode {
-    padding: 0.3rem;
-    font-size: 0.72rem;
-  }
 }
 
 @media (hover: none) {

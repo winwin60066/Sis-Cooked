@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Clipboard, FileImage, ImagePlus, Pencil, Plus, Printer, Search, Trash2, X } from 'lucide-react'
-import { getIngredientCost, getRecipeCost } from '../../utils/recipeCost'
+import { getIngredientCost, getRecipeCost, hasPurchasePack } from '../../utils/recipeCost'
 import './Recipes.css'
 
 const emptyIngredient = (units) => ({
@@ -10,7 +10,6 @@ const emptyIngredient = (units) => ({
   purchaseAmount: '',
   purchaseUnit: units.includes('g') ? 'g' : units[0],
   purchasePrice: '',
-  costMode: 'purchase',
   cost: '',
 })
 const emptyForm = {
@@ -399,7 +398,6 @@ export default function Recipes({
           ? {
             ...emptyIngredient(units),
             name: ingredient,
-            costMode: 'manual',
           }
           : {
             ...emptyIngredient(units),
@@ -412,7 +410,6 @@ export default function Recipes({
               ? ingredient.purchaseUnit
               : (units.includes(ingredient.unit) ? ingredient.unit : (units.includes('g') ? 'g' : units[0])),
             purchasePrice: ingredient.purchasePrice === undefined ? '' : String(ingredient.purchasePrice),
-            costMode: ingredient.costMode || (ingredient.cost === '' || ingredient.cost === undefined ? 'purchase' : 'manual'),
             cost: ingredient.cost === undefined ? '' : String(ingredient.cost),
           }
       )),
@@ -490,8 +487,7 @@ export default function Recipes({
           purchaseAmount: ingredient.purchaseAmount.trim() ? Number(ingredient.purchaseAmount) : '',
           purchaseUnit: ingredient.purchaseUnit,
           purchasePrice: ingredient.purchasePrice.trim() ? Number(ingredient.purchasePrice) : '',
-          costMode: ingredient.costMode,
-          cost: ingredient.costMode === 'manual' && ingredient.cost.trim()
+          cost: ingredient.cost.trim()
             ? Number(ingredient.cost)
             : '',
         })),
@@ -792,7 +788,15 @@ export default function Recipes({
                           {units.map((unit) => <option key={unit}>{unit}</option>)}
                         </select>
                         <div className="ingredient-cost-cell">
-                          {ingredient.costMode === 'manual' ? (
+                          {hasPurchasePack(ingredient) ? (
+                            <input
+                              type="text"
+                              value={getIngredientCostLabel(ingredient)}
+                              placeholder="RM —"
+                              readOnly
+                              aria-label={`Calculated used cost in RM for ingredient ${index + 1}`}
+                            />
+                          ) : (
                             <input
                               type="number"
                               min="0"
@@ -802,28 +806,7 @@ export default function Recipes({
                               placeholder="RM"
                               aria-label={`Used cost in RM for ingredient ${index + 1}`}
                             />
-                          ) : (
-                            <input
-                              type="text"
-                              value={getIngredientCostLabel(ingredient)}
-                              placeholder="RM —"
-                              readOnly
-                              aria-label={`Calculated used cost in RM for ingredient ${index + 1}`}
-                            />
                           )}
-                          <button
-                            className="ingredient-cost-mode"
-                            type="button"
-                            onClick={() => {
-                              const calculatedCost = getIngredientCost(ingredient)
-                              updateIngredient(index, 'costMode', ingredient.costMode === 'manual' ? 'purchase' : 'manual')
-                              if (ingredient.costMode !== 'manual' && calculatedCost !== null) {
-                                updateIngredient(index, 'cost', String(calculatedCost))
-                              }
-                            }}
-                          >
-                            {ingredient.costMode === 'manual' ? 'Auto' : 'Manual'}
-                          </button>
                         </div>
                         <button
                           className="remove-row-button"
@@ -874,15 +857,17 @@ export default function Recipes({
                           </label>
                         </div>
                         <p className="ingredient-cost-hint">
-                          {getIngredientCost(ingredient) !== null
+                          {hasPurchasePack(ingredient) && getIngredientCost(ingredient) !== null
                             ? `${ingredient.purchaseAmount} ${ingredient.purchaseUnit} for RM ${Number(ingredient.purchasePrice).toFixed(2)} → this recipe uses ${ingredient.amount} ${ingredient.unit} = ${getIngredientCostLabel(ingredient)}`
-                            : 'Enter a pack size, its price, and compatible units to calculate this recipe’s cost.'}
+                            : hasPurchasePack(ingredient)
+                              ? 'Check the pack and used amounts and make sure their units are compatible.'
+                              : 'Fill in pack size and pack price to calculate this ingredient automatically.'}
                         </p>
                       </details>
                     </div>
                   ))}
                 </div>
-                <p className="ingredient-cost-hint">Example: 250 ml for RM 10, using 100 ml = RM 4.00. Or choose Manual to enter this recipe’s cost.</p>
+                <p className="ingredient-cost-hint">Example: 250 ml for RM 10, using 100 ml = RM 4.00. Enter a used cost directly, or fill in the purchase pack to calculate it automatically.</p>
                 <button
                   className="add-row-button"
                   type="button"

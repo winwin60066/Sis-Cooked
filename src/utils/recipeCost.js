@@ -20,10 +20,16 @@ function getPositiveNumber(value) {
   return Number.isFinite(number) && number > 0 ? number : null
 }
 
+export function hasPurchasePack(ingredient) {
+  if (typeof ingredient === 'string') return false
+  const hasValue = (value) => value !== null && value !== undefined && String(value).trim() !== ''
+  return hasValue(ingredient.purchaseAmount) && hasValue(ingredient.purchasePrice)
+}
+
 export function getIngredientCost(ingredient) {
   if (typeof ingredient === 'string') return null
 
-  if (ingredient.costMode !== 'purchase') {
+  if (!hasPurchasePack(ingredient)) {
     if (ingredient.cost === '' || ingredient.cost === null || ingredient.cost === undefined) return null
     const manualCost = Number(ingredient.cost)
     return Number.isFinite(manualCost) && manualCost >= 0 ? manualCost : null
